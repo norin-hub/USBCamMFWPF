@@ -5,8 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:USBカメラMFWPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded">
     <Grid>
-        
+        <ComboBox x:Name="devicesCombo" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="233" SelectionChanged="devicesCombo_SelectionChanged"/>
+        <ComboBox x:Name="mediaCombo" HorizontalAlignment="Left" Margin="260,10,0,0" VerticalAlignment="Top" Width="233"/>
+        <Button x:Name="button" Content="Cap" HorizontalAlignment="Left" Margin="519,12,0,0" VerticalAlignment="Top" Width="75" Click="button_Click"/>
+        <Image x:Name="image" HorizontalAlignment="Left" Height="372" Margin="10,37,0,0" VerticalAlignment="Top" Width="772"/>
+
     </Grid>
 </Window>

@@ -35,6 +35,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MediaFoundation">
+      <HintPath>C:\Users\norin\Downloads\MFLibv3_1\lib\MediaFoundation.dll</HintPath>
+    </Reference>
+    <Reference Include="MediaFoundation.Extension">
+      <HintPath>C:\Users\norin\Downloads\MFLibv3_1\lib\MediaFoundation.Extension.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -90,6 +96,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
