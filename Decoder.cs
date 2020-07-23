@@ -77,50 +77,17 @@ namespace Decoder
 				int u0 = input[p2++];
 				int v0 = input[p3++];
 
-                //		int y0 = input[p++];
-                //		int y1 = input[p++];
-                //		int u0 = input[p++];
-                //		int v0 = input[p++];
                 int c = y0 - 16;
                 int d = u0 - 128;
                 int e = v0 - 128;
 				output[o++] = Yuy2Decoder.ClampByte((298 * c + 409 * e + 128) >> 8);            // red
 				output[o++] = Yuy2Decoder.ClampByte((298 * c - 100 * d - 208 * e + 128) >> 8);  // green
 				output[o++] = Yuy2Decoder.ClampByte((298 * c + 516 * d + 128) >> 8);            // blue
-																								//output[o++] = 255;
 				c = y1 - 16;
 				output[o++] = Yuy2Decoder.ClampByte((298 * c + 409 * e + 128) >> 8);            // red
                 output[o++] = Yuy2Decoder.ClampByte((298 * c - 100 * d - 208 * e + 128) >> 8);  // green
 				output[o++] = Yuy2Decoder.ClampByte((298 * c + 516 * d + 128) >> 8);            // blue
-																								//output[o++] = 255;
-
 			}
-
-
-			//for (int j = 0; j < height; j++)
-			//{
-			//	for (int i = 0; i < halfWidth; ++i)
-			//	{
-			//		int y0 = input[p++];
-			//		int y1 = input[p++];
-			//		int u0 = input[p++];
-			//		int v0 = input[p++];
-			//		int c = y0 - 16;
-			//		int d = u0 - 128;
-			//		int e = v0 - 128;
-			//		output[o++] = Yuy2Decoder.ClampByte((298 * c + 516 * d + 128) >> 8);            // blue
-			//		output[o++] = Yuy2Decoder.ClampByte((298 * c - 100 * d - 208 * e + 128) >> 8);  // green
-			//		output[o++] = Yuy2Decoder.ClampByte((298 * c + 409 * e + 128) >> 8);            // red
-			//		output[o++] = 255;
-			//		c = y1 - 16;
-			//		output[o++] = Yuy2Decoder.ClampByte((298 * c + 516 * d + 128) >> 8);            // blue
-			//		output[o++] = Yuy2Decoder.ClampByte((298 * c - 100 * d - 208 * e + 128) >> 8);  // green
-			//		output[o++] = Yuy2Decoder.ClampByte((298 * c + 409 * e + 128) >> 8);            // red
-			//		output[o++] = 255;
-			//	}
-			//}
-
-
 
 		}
 	}

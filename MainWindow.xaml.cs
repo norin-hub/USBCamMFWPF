@@ -180,6 +180,38 @@ namespace USBカメラMFWPF
                 }
                 releaser.Add(reader);
 
+                IMFTransform transform = null;
+                MFTOutputDataBuffer[] outSamples = null;
+                IMFSample outRgb24Sample = null;
+                IMFMediaBuffer outRgb24Buffer = null;
+
+                int rgbSize = item.Width * item.Height * 3;
+
+                var needToConvert = item.SubType != MFMediaType.RGB24;
+                if (needToConvert)
+                {
+                    var processor = new VideoProcessorMFT();
+                    releaser.Add(processor);
+                    transform = (IMFTransform)processor;
+                    HR(transform.SetInputType(0, type, MFTSetTypeFlags.None));
+                    var rgbMediaType = MF.CreateMediaType();
+                    releaser.Add(rgbMediaType);
+                    HR(type.CopyAllItems(rgbMediaType));
+                    HR(rgbMediaType.SetGUID(MFAttributesClsid.MF_MT_SUBTYPE, MFMediaType.RGB24));
+                    HR(rgbMediaType.SetUINT32(MFAttributesClsid.MF_MT_DEFAULT_STRIDE, 3 * item.Width));
+                    HR(rgbMediaType.SetUINT32(MFAttributesClsid.MF_MT_SAMPLE_SIZE, rgbSize));
+                    HR(transform.SetOutputType(0, rgbMediaType, MFTSetTypeFlags.None));
+
+                    outSamples = new MFTOutputDataBuffer[1];
+                    outSamples[0] = new MFTOutputDataBuffer();
+                    outRgb24Sample = MF.CreateSample();
+                    releaser.Add(outRgb24Sample);
+                    outRgb24Buffer = MF.CreateMemoryBuffer(rgbSize);
+                    releaser.Add(outRgb24Buffer);
+                    outRgb24Sample.AddBuffer(outRgb24Buffer);
+                    outSamples[0].pSample = Marshal.GetIUnknownForObject(outRgb24Sample);
+                }
+
                 while (true)
                 {
                     int frames = 0;
@@ -197,6 +229,35 @@ namespace USBカメラMFWPF
                         try
                         {
                             IMFSample rgbSample = sample;
+
+                            if (transform != null)
+                            {
+                                transform.ProcessInput(0, sample, 0);
+                                while (true)
+                                {
+                                    var hrPO = transform.ProcessOutput(
+                                        MFTProcessOutputFlags.None,
+                                        1,
+                                        outSamples,
+                                        out ProcessOutputStatus status
+                                    );
+                                    if (hrPO.Succeeded())
+                                    {
+                                        ConsumeBuffer(outRgb24Buffer, item);
+                                        frames++;
+                                        Marshal.ReleaseComObject(sample);
+                                        return;
+                                        //break;
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                                //var hrPI = transform.ProcessInput(0, sample, 0);
+                                continue;
+                            }
+
                             rgbSample.GetBufferByIndex(0, out IMFMediaBuffer buff);
                             if (ConsumeBuffer(buff, item))
                             {
@@ -228,23 +289,8 @@ namespace USBカメラMFWPF
                     byte[] temp = new byte[curLen];
                     Marshal.Copy(ptr, temp, 0, temp.Length);
                     int stride = item.Width * 3;
-                    int tmpheight;
+                    int tmpheight = item.Height;
 
-                    if (item.SubType.ToString() == "00000014-0000-0010-8000-00aa00389b71")//RGB
-                    {
-                        tmpheight = item.Height;
-                    }else if(item.SubType.ToString() == "30323449-0000-0010-8000-00aa00389b71")//I420
-                    {
-                        byte[] tout = new byte[stride * item.Height];
-                        Decoder.I420Decoder.DecompressI420(temp, item.Width, item.Height, tout);
-                        temp = tout;
-                        tmpheight = item.Height;
-                        //tmpheight = curLen / stride;
-                    }
-                    else
-                    {
-                        tmpheight = curLen / stride;
-                    }
                     BitmapSource src = BitmapSource.Create(item.Width, tmpheight, 600, 600, PixelFormats.Bgr24, null, temp, stride);
                     image.Source = src;
 
@@ -260,6 +306,12 @@ namespace USBカメラMFWPF
                 buff.Unlock();
             }
         }
+
+        private void HR(HResult hr)
+        {
+            Debug.Assert(hr.Succeeded());
+        }
+
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
