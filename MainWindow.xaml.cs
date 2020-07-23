@@ -235,11 +235,11 @@ namespace USBカメラMFWPF
                         tmpheight = item.Height;
                     }else if(item.SubType.ToString() == "30323449-0000-0010-8000-00aa00389b71")//I420
                     {
-                        //byte[] tout = new byte[stride * item.Height];
-                        //Decoder.I420Decoder.DecompressI420(temp, item.Width, item.Height, tout);
-                        //temp = tout;
-                        //tmpheight = item.Height;
-                        tmpheight = curLen / stride;
+                        byte[] tout = new byte[stride * item.Height];
+                        Decoder.I420Decoder.DecompressI420(temp, item.Width, item.Height, tout);
+                        temp = tout;
+                        tmpheight = item.Height;
+                        //tmpheight = curLen / stride;
                     }
                     else
                     {
