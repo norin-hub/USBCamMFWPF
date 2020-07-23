@@ -180,9 +180,6 @@ namespace USBカメラMFWPF
                 }
                 releaser.Add(reader);
 
-                int rgbSize = item.Width * item.Height * 3;
-
-
                 while (true)
                 {
                     int frames = 0;
@@ -231,7 +228,24 @@ namespace USBカメラMFWPF
                     byte[] temp = new byte[curLen];
                     Marshal.Copy(ptr, temp, 0, temp.Length);
                     int stride = item.Width * 3;
-                    BitmapSource src = BitmapSource.Create(item.Width, item.Height, 600, 600, PixelFormats.Bgr24, null, temp, stride);
+                    int tmpheight;
+
+                    if (item.SubType.ToString() == "00000014-0000-0010-8000-00aa00389b71")//RGB
+                    {
+                        tmpheight = item.Height;
+                    }else if(item.SubType.ToString() == "30323449-0000-0010-8000-00aa00389b71")//I420
+                    {
+                        //byte[] tout = new byte[stride * item.Height];
+                        //Decoder.I420Decoder.DecompressI420(temp, item.Width, item.Height, tout);
+                        //temp = tout;
+                        //tmpheight = item.Height;
+                        tmpheight = curLen / stride;
+                    }
+                    else
+                    {
+                        tmpheight = curLen / stride;
+                    }
+                    BitmapSource src = BitmapSource.Create(item.Width, tmpheight, 600, 600, PixelFormats.Bgr24, null, temp, stride);
                     image.Source = src;
 
                     return true;
